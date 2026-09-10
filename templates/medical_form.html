@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediPulse — Patient Screening Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --ink:#0B1F26;
+    --ink-2:#122E38;
+    --paper:#F5F8F7;
+    --panel:#FFFFFF;
+    --line:#E1E8E6;
+    --line-strong:#CBD6D3;
+    --text:#10262E;
+    --muted:#5B6B70;
+    --pulse:#3FCB84;
+    --pulse-dim:#B9E9CD;
+    --amber:#E8A93B;
+    --coral:#FF6B5B;
+    --blue:#5B8DEF;
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif;letter-spacing:-0.01em;color:var(--ink);margin:0;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:3px;}
+
+  /* ---------- TOP BAR ---------- */
+  header.site{
+    position:sticky;top:0;z-index:50;
+    background:rgba(245,248,247,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar{max-width:900px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;color:var(--ink);}
+  .brand .mark{width:28px;height:28px;flex:none;}
+  .back-link{
+    display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--muted);
+    font-size:0.86rem;font-weight:600;padding:8px 14px;border-radius:999px;border:1px solid var(--line-strong);
+    transition:border-color .15s ease,color .15s ease;
+  }
+  .back-link:hover{color:var(--ink);border-color:var(--ink);}
+
+  /* ---------- PAGE HEAD ---------- */
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px;}
+  .page-head{padding:44px 0 28px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:0.75rem;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--pulse);background:rgba(63,203,132,0.1);border:1px solid rgba(63,203,132,0.35);
+    padding:6px 12px;border-radius:999px;margin-bottom:16px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--pulse);animation:blink 1.6s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .page-head h1{font-size:clamp(1.6rem,3.4vw,2.15rem);line-height:1.15;}
+  .page-head p{color:var(--muted);margin-top:12px;font-size:0.98rem;line-height:1.6;max-width:56ch;}
+
+  /* ---------- PROGRESS STRIP ---------- */
+  .progress-strip{display:flex;gap:8px;margin-top:26px;}
+  .progress-strip .seg{height:4px;flex:1;border-radius:4px;background:var(--line);position:relative;overflow:hidden;}
+  .progress-strip .seg::after{content:"";position:absolute;inset:0;background:var(--pulse);transform:scaleX(0);transform-origin:left;transition:transform .3s ease;}
+  .progress-strip .seg.filled::after{transform:scaleX(1);}
+
+  /* ---------- CARD / SECTIONS ---------- */
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:22px;
+    padding:8px;box-shadow:0 30px 60px -34px rgba(11,31,38,0.25);margin:22px 0 60px;
+  }
+  .form-section{padding:30px 32px;}
+  .form-section + .form-section{border-top:1px solid var(--line);}
+  @media (max-width:640px){ .form-section{padding:26px 20px;} }
+
+  .section-title{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
+  .section-title .ico{
+    width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:1rem;flex:none;
+  }
+  .section-title h3{font-size:1.05rem;}
+  .section-title span.step{
+    font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
+    display:block;margin-bottom:2px;
+  }
+
+  .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px 20px;}
+  @media (max-width:640px){ .form-grid{grid-template-columns:1fr;} }
+  .full-width{grid-column:span 2;}
+  @media (max-width:640px){ .full-width{grid-column:span 1;} }
+
+  .field-group{display:flex;flex-direction:column;gap:8px;}
+  label{
+    font-size:0.72rem;font-weight:600;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:6px;
+  }
+  label i{color:var(--pulse);font-size:0.78rem;width:14px;text-align:center;}
+
+  .input-wrap{position:relative;}
+  input, select{
+    width:100%;padding:12px 14px 12px 14px;border:1px solid var(--line-strong);border-radius:10px;
+    font-family:'Inter',sans-serif;font-size:0.95rem;color:var(--text);background:#fff;
+    transition:border-color .15s ease, box-shadow .15s ease;appearance:none;
+  }
+  input::placeholder{color:#A9B6B8;}
+  input:hover, select:hover{border-color:#B7C4C1;}
+  input:focus, select:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 3px rgba(11,31,38,0.08);}
+
+  select{padding-right:36px;cursor:pointer;}
+  .input-wrap.select::after{
+    content:"\f078";font-family:"Font Awesome 6 Free";font-weight:900;font-size:0.72rem;color:var(--muted);
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;
+  }
+  .unit-tag{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);
+    background:var(--paper);padding:2px 7px;border-radius:6px;pointer-events:none;
+  }
+  .input-wrap.has-unit input{padding-right:56px;}
+
+  /* remove number spinners for a cleaner look */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  input[type=number]{-moz-appearance:textfield;}
+
+  /* ---------- SUBMIT BAR ---------- */
+  .submit-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    padding:24px 32px 30px;
+  }
+  @media (max-width:640px){ .submit-bar{padding:22px 20px 26px;flex-direction:column;align-items:stretch;} }
+  .submit-note{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:0.84rem;max-width:36ch;}
+  .submit-note i{color:var(--amber);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    padding:15px 30px;border-radius:999px;font-weight:600;font-size:0.98rem;
+    background:var(--ink);color:#fff;border:none;cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;white-space:nowrap;
+  }
+  .btn:hover{box-shadow:0 10px 24px rgba(11,31,38,0.28);}
+  .btn:active{transform:translateY(1px);}
+
+  .disclaimer{
+    display:flex;gap:12px;align-items:flex-start;color:var(--muted);font-size:0.82rem;line-height:1.55;
+    border:1px dashed var(--line-strong);border-radius:14px;padding:16px 18px;background:rgba(232,169,59,0.06);
+    margin-bottom:56px;
+  }
+  .disclaimer i{color:var(--amber);margin-top:2px;}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="topbar">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="15" fill="#0B1F26"/>
+        <path d="M4 15H10L12.5 8L17 22L19.5 15H26" stroke="#3FCB84" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      MediPulse
+    </div>
+    <a href="/" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to dashboard</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="page-head">
+    <span class="eyebrow"><span class="dot"></span> Screening intake</span>
+    <h1>Let's run your health screening.</h1>
+    <p>Fill in your current vitals and lifestyle details below. It takes about two minutes, and everything stays on this form until you submit.</p>
+    <div class="progress-strip">
+      <div class="seg filled"></div>
+      <div class="seg filled"></div>
+      <div class="seg filled"></div>
+      <div class="seg filled"></div>
+    </div>
+  </div>
+
+  <form action="/predict" method="POST">
+    <div class="card">
+
+      <!-- SECTION 1: BASICS -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="ico" style="background:var(--ink);"><i class="fa-solid fa-id-card"></i></div>
+          <div><span class="step">Section 01</span><h3>Basic information</h3></div>
+        </div>
+        <div class="form-grid">
+          <!-- Name Field Added Before Age -->
+          <div class="field-group full-width">
+            <label for="PatientName"><i class="fa-solid fa-user"></i> Full Name</label>
+            <div class="input-wrap">
+              <input type="text" id="PatientName" name="PatientName" placeholder="e.g. John Doe">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="Age"><i class="fa-solid fa-cake-candles"></i> Age</label>
+            <div class="input-wrap">
+              <input type="number" id="Age" name="Age" min="0" placeholder="e.g. 45" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="Gender"><i class="fa-solid fa-venus-mars"></i> Gender</label>
+            <div class="input-wrap select">
+              <select id="Gender" name="Gender" required>
+                <option value="" disabled selected>Select gender</option>
+                <option value="1">Male (1)</option>
+                <option value="0">Female (0)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: VITALS & LABS -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="ico" style="background:var(--coral);"><i class="fa-solid fa-heart-pulse"></i></div>
+          <div><span class="step">Section 02</span><h3>Vitals &amp; labs</h3></div>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="BMI"><i class="fa-solid fa-weight-scale"></i> BMI</label>
+            <div class="input-wrap">
+              <input type="number" step="0.1" id="BMI" name="BMI" min="0" placeholder="e.g. 24.5" required>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="BloodPressure"><i class="fa-solid fa-gauge-high"></i> Blood pressure</label>
+            <div class="input-wrap has-unit">
+              <input type="number" id="BloodPressure" name="BloodPressure" min="0" placeholder="e.g. 120" required>
+              <span class="unit-tag">mmHg</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="GlucoseLevel"><i class="fa-solid fa-droplet"></i> Glucose level</label>
+            <div class="input-wrap has-unit">
+              <input type="number" id="GlucoseLevel" name="GlucoseLevel" min="0" placeholder="e.g. 95" required>
+              <span class="unit-tag">mg/dL</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="Cholesterol"><i class="fa-solid fa-vial"></i> Cholesterol</label>
+            <div class="input-wrap has-unit">
+              <input type="number" id="Cholesterol" name="Cholesterol" min="0" placeholder="e.g. 200" required>
+              <span class="unit-tag">mg/dL</span>
+            </div>
+          </div>
+          <div class="field-group full-width">
+            <label for="HeartRate"><i class="fa-solid fa-wave-square"></i> Heart rate</label>
+            <div class="input-wrap has-unit">
+              <input type="number" id="HeartRate" name="HeartRate" min="0" placeholder="e.g. 72" required>
+              <span class="unit-tag">bpm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: LIFESTYLE -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="ico" style="background:var(--blue);"><i class="fa-solid fa-person-walking"></i></div>
+          <div><span class="step">Section 03</span><h3>Lifestyle</h3></div>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label for="Smoking"><i class="fa-solid fa-smoking"></i> Smoking</label>
+            <div class="input-wrap select">
+              <select id="Smoking" name="Smoking" required>
+                <option value="" disabled selected>Select option</option>
+                <option value="0">No (0)</option>
+                <option value="1">Yes (1)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="Alcohol"><i class="fa-solid fa-wine-glass"></i> Alcohol</label>
+            <div class="input-wrap select">
+              <select id="Alcohol" name="Alcohol" required>
+                <option value="" disabled selected>Select option</option>
+                <option value="0">No (0)</option>
+                <option value="1">Yes (1)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-group full-width">
+            <label for="PhysicalActivity"><i class="fa-solid fa-person-running"></i> Physical activity</label>
+            <div class="input-wrap select">
+              <select id="PhysicalActivity" name="PhysicalActivity" required>
+                <option value="" disabled selected>Select level</option>
+                <option value="1">Low (1)</option>
+                <option value="2">Medium (2)</option>
+                <option value="3">High (3)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: HISTORY -->
+      <div class="form-section">
+        <div class="section-title">
+          <div class="ico" style="background:var(--amber);"><i class="fa-solid fa-people-roof"></i></div>
+          <div><span class="step">Section 04</span><h3>Family history</h3></div>
+        </div>
+        <div class="form-grid">
+          <div class="field-group full-width">
+            <label for="FamilyHistory"><i class="fa-solid fa-dna"></i> History of these conditions in your family</label>
+            <div class="input-wrap select">
+              <select id="FamilyHistory" name="FamilyHistory" required>
+                <option value="" disabled selected>Select option</option>
+                <option value="0">No (0)</option>
+                <option value="1">Yes (1)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="submit-bar">
+        <div class="submit-note"><i class="fa-solid fa-lock"></i> Your data is used only to generate this result and isn't stored.</div>
+        <button type="submit" class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Run AI prediction</button>
+      </div>
+
+    </div>
+  </form>
+  <!-- Prediction Result Display Box -->
+{% if prediction_text %}
+<div style="background: #E8F8F0; border: 1px solid #3FCB84; border-radius: 14px; padding: 20px 24px; margin-bottom: 30px; text-align: center;">
+    <h3 style="color: #0B1F26; margin-bottom: 8px;"><i class="fa-solid fa-circle-check" style="color: #3FCB84;"></i> Screening Result</h3>
+    <p style="font-size: 1.15rem; font-weight: 600; color: #10262E; margin: 0;" class="mono">{{ prediction_text }}</p>
+</div>
+{% endif %}
+
+  <div class="disclaimer">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div>This tool gives an informational risk estimate, not a medical diagnosis. Always discuss a moderate or high result with a licensed clinician.</div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    // Prevent value change via mouse/touchpad scroll
+    input.addEventListener('wheel', function(e){ e.preventDefault(); }, { passive:false });
+    // Block minus and exponent keys
+    input.addEventListener('keydown', function(e){
+      if (e.key === '-' || e.key === 'e' || e.key === 'E') e.preventDefault();
+    });
+  });
+</script>
+
+</body>
+</html>
